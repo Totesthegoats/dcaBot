@@ -4,7 +4,6 @@ Created on 30 March 2021
 @author: Totes
 '''
 
-from itertools import count
 import time
 import math
 import tweepy
@@ -14,11 +13,9 @@ from binance.enums import *
 from binance.exceptions import BinanceAPIException, BinanceOrderException
 
 #real API
-api_key  =  os.environ.get('binance_api')
-print(api_key)
-#
-secretKey =  os.environ.get('binance_secret')
-print(secretKey)
+api_key  =  os.environ.get('binance_api') # OR add your API KEY here
+
+secretKey =  os.environ.get('binance_secret') # OR add your API SecretKey here
 
 #Test API keys
 #api_key  = testKey
@@ -26,6 +23,29 @@ print(secretKey)
 #secretKey =  sTestKey
 
 client = Client(api_key, secretKey)
+
+# def getAllOrdrs(tradingPair):
+#     #client.API_URL = 'https://testnet.binance.vision/api'
+#     orders = client.get_all_orders(symbol=tradingPair)
+#     return orders
+
+# def getRecentTrades(tradingPair):
+#     #client.API_URL = 'https://testnet.binance.vision/api'
+#     trades = client.get_recent_trades(symbol=tradingPair)
+#     return trades
+
+# def placeSellOrder(price, tradingPair):
+#     #client.API_URL = 'https://testnet.binance.vision/api'
+#     order = client.create_order(symbol=tradingPair, side='SELL', type='MARKET', quantity=100)
+#     return(order)
+
+
+# def cancleOrders():
+#     #client.API_URL = 'https://testnet.binance.vision/api'
+#     print(client.get_open_orders())
+#     for row in client.get_open_orders():
+#         client.cancel_order(symbol=row["symbol"], orderId=row['orderId'])
+#     print(client.get_open_orders())
 
 def tweet(order):
     auth = tweepy.OAuthHandler("CONSUMER_KEY", "CONSUMER_SECRET")
@@ -35,20 +55,10 @@ def tweet(order):
 
     api.update_status(order)
 
-def getAllOrdrs(tradingPair):
-    #client.API_URL = 'https://testnet.binance.vision/api'
-    orders = client.get_all_orders(symbol=tradingPair)
-    return orders
-
-def getRecentTrades(tradingPair):
-    #client.API_URL = 'https://testnet.binance.vision/api'
-    trades = client.get_recent_trades(symbol=tradingPair)
-    return trades
-
 def getBalances():
     # Makes a request to Biances API for the account balance of what ever you are trading EUR in my case
     #client.API_URL = 'https://testnet.binance.vision/api'
-    balance = client.get_asset_balance(asset = 'EUR')
+    balance = client.get_asset_balance(asset = 'EUR') # Change this for your fiat pair
     return balance
 
 def getMarketPrice(tradingPair):
@@ -73,18 +83,6 @@ def placeBuyOrder(quantity, tradingPair):
         print(e)
     return
 
-def placeSellOrder(price, tradingPair):
-    #client.API_URL = 'https://testnet.binance.vision/api'
-    order = client.create_order(symbol=tradingPair, side='SELL', type='MARKET', quantity=100)
-    return(order)
-
-
-def cancleOrders():
-    #client.API_URL = 'https://testnet.binance.vision/api'
-    print(client.get_open_orders())
-    for row in client.get_open_orders():
-        client.cancel_order(symbol=row["symbol"], orderId=row['orderId'])
-    print(client.get_open_orders())
 
 def dcaBot(tradingPair, dcaAmount):
     #client.API_URL = 'https://testnet.binance.vision/api'
@@ -123,6 +121,7 @@ def dcaBot(tradingPair, dcaAmount):
         print(e)
 
 if __name__ == '__main__':
+    
     timeFrame = input("Enter DCA time frame (day, week, month):" )
     dcaTimeFrame = {
         "day": 86400,
