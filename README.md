@@ -1,4 +1,4 @@
-"# dcaBot" 
+"# trade" 
 The bot will DCA into your crypto of choice.
 Binance doesn't offer a DCA option, so I have created this bot. 
 
