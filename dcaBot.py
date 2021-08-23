@@ -1,5 +1,5 @@
 '''
-Created on 30 March 2021
+Created on 23 August  2021
 
 @author: Totes
 '''
@@ -17,6 +17,9 @@ api_key  =  os.environ.get('binance_api') # OR add your API KEY here
 
 secretKey =  os.environ.get('binance_secret') # OR add your API SecretKey here
 
+auth = tweepy.OAuthHandler("CONSUMER_KEY", "CONSUMER_SECRET")
+auth.set_access_token("ACCESS_TOKEN", "ACCESS_TOKEN_SECRET")
+api = tweepy.API(auth)
 #Test API keys
 #api_key  = testKey
 
@@ -48,12 +51,32 @@ client = Client(api_key, secretKey)
 #     print(client.get_open_orders())
 
 def tweet(order):
-    auth = tweepy.OAuthHandler("CONSUMER_KEY", "CONSUMER_SECRET")
-    auth.set_access_token("ACCESS_TOKEN", "ACCESS_TOKEN_SECRET")
-
-    api = tweepy.API(auth)
-
     api.update_status(order)
+
+def twitterDM():
+  # gets the last 10 direct messages
+  messages = api.list_direct_messages(count=10)
+  # set up 3 lists for our variables, this will allow us to get the latest version message we have sent
+  amount = []
+  time = []
+  fiat = []
+  # Run a for loop through the message subset, reverse the messages so that you get the last message sent to the bot first
+  for message in reversed(messages):
+    sender_id = message.message_create["sender_id"]
+    if sender_id == "YOURSENDERID": #you will need to find your own sender ID
+      text = message.message_create["message_data"]["text"]
+      if "$" in text: # This will find our buy amount
+        amount.append(text.split("$")[1])
+      elif "-" in text: # this will find our time frame
+        time.append(text.split("-")[1])
+      elif "EUR" in text: #  this will find our trading pair
+        fiat.append(text)
+
+  # ensures we get the last message sent, meaning we will be able to change one variable at a time
+  dcaAmount = amount[-1]
+  timeFrame = time[-1]
+  fiatPair = fiat[-1]
+  return dcaAmount, timeFrame, fiatPair
 
 def getBalances():
     # Makes a request to Biances API for the account balance of what ever you are trading EUR in my case
@@ -121,22 +144,18 @@ def dcaBot(tradingPair, dcaAmount):
         print(e)
 
 if __name__ == '__main__':
-    
-    timeFrame = input("Enter DCA time frame (day, week, month):" )
+
+    dcaAmount, timeFrame, fiatPair = twitterDM()
     dcaTimeFrame = {
         "day": 86400,
         "week": 604800,
         "month": 2629746
     }
-    print("This bot will check the ballence of you account until money has been lodged, you must set up standing order yourself.")
-
-    dcaAmount = float(input("Enter how much you want to buy in fiat:"))
+    print("This bot will check the ballence of your account until money has been lodged, you must set up standing order yourself.")
 
     print("You have chosen to DCA ", dcaTimeFrame[timeFrame.lower()])
     print('Press Ctrl-C to stop.')
     # Change this to your fiat crypto pair
-    fiatPair = 'ETHEUR'
-
 
     for i in count():
         dcaBot(fiatPair, dcaAmount) #(buyAmount) if set amount
